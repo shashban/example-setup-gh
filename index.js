@@ -1,21 +1,30 @@
+const path = require('path');
 const core = require('@actions/core');
-const wait = require('./wait');
+const tc = require('@actions/tool-cache');
+const { getDownloadObject } = require('./lib/utils');
 
-
-// most @actions toolkit packages have async methods
-async function run() {
+async function setup() {
   try {
-    const ms = core.getInput('milliseconds');
-    core.info(`Waiting ${ms} milliseconds ...`);
+    // Get version of tool to be installed
+    const version = core.getInput('version');
 
-    core.debug((new Date()).toTimeString()); // debug is only output if you set the secret `ACTIONS_RUNNER_DEBUG` to true
-    await wait(parseInt(ms));
-    core.info((new Date()).toTimeString());
+    // Download the specific version of the tool, e.g. as a tarball/zipball
+    const download = getDownloadObject(version);
+    const pathToTarball = await tc.downloadTool(download.url);
 
-    core.setOutput('time', new Date().toTimeString());
-  } catch (error) {
-    core.setFailed(error.message);
+    // Extract the tarball/zipball onto host runner
+    const extract = download.url.endsWith('.zip') ? tc.extractZip : tc.extractTar;
+    const pathToCLI = await extract(pathToTarball);
+
+    // Expose the tool by adding it to the PATH
+    core.addPath(path.join(pathToCLI, download.binPath));
+  } catch (e) {
+    core.setFailed(e);
   }
 }
 
-run();
+module.exports = setup
+
+if (require.main === module) {
+  setup();
+}

@@ -1,13 +1,10 @@
-name: 'Wait'
-description: 'Wait a designated number of milliseconds'
+name: setup-gh
+description: Setup GitHub CLI, gh, on GitHub Actions runners
 inputs:
-  milliseconds:  # id of input
-    description: 'number of milliseconds to wait'
-    required: true
-    default: '1000'
-outputs:
-  time: # output will be available to future steps
-    description: 'The message to output'
+  version:
+    description: Version of GitHub CLI to install
+    required: false
+    default: 1.2.0
 runs:
-  using: 'node12'
-  main: 'dist/index.js'
+  using: node12
+  main: dist/index.js
