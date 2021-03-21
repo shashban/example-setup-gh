@@ -10,11 +10,6 @@
    A GitHub Action for setting up GH CLI on Linux, Windows, and macOS runners
 </p>
 
-<div align="center">
-  <img src="demo.png"/>
-</div>
-
-
 <br />
 
 ## About
